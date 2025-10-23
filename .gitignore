@@ -1,0 +1,11 @@
+dfs.py
+example.py
+file.py
+helper.py
+matrix.py
+matrix2.py
+main.spec
+image.png
+__pycache__
+build/
+dist/ 
