@@ -8,4 +8,5 @@ main.spec
 image.png
 __pycache__
 build/
-dist/ 
+dist/
+matrix3.py

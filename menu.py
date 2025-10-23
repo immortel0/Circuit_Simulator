@@ -6,9 +6,6 @@ import webbrowser
 def open_link(url):
     webbrowser.open_new_tab(url)
 
-link_text = "Source Code"
-link_url = "http://www.example.com"
-
 def donothing():
     print("Nothing happens")
 
@@ -70,3 +67,6 @@ control_guide_text = """Controls Guide:
 - Left Click to place component
 - Right Click on component to delete it
 """
+
+link_text = "Source Code"
+link_url = "https://github.com/immortel0/Circuit_Simulator"
