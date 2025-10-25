@@ -32,6 +32,7 @@ menu.initialize_menu(root)
 components = []
 component_frames = []
 
+height_adjustment = 0
 
 # Functions
 
@@ -52,12 +53,16 @@ def place_component(event):
 
     container = tk.Frame(root, width=64, height=64, background="black")
     container.place(x=mouse_x - 32, y=mouse_y - 32)
-    container.bind('<Button-3>', delete_self)
+    container.bind('<Button-2>', delete_self)
     container.bind('<B1-Motion>', on_drag)
-   
-    icon = tk.Label(container, image=component.image)
+  
+    if texture_pack == "Symbolic":
+        icon = tk.Label(container, image=component.image_symbolic)
+    elif texture_pack == "64x64":
+        icon = tk.Label(container, image=component.image_64x64)
+    
     icon.pack()
-    icon.bind('<Button-3>', delete_self)
+    icon.bind('<Button-2>', delete_self)
     icon.bind('<B1-Motion>', on_drag)
 
     components.append(component)
@@ -85,7 +90,7 @@ def on_drag(event: tk.Event):
     elif widget in component_frames:
         container = widget
     
-    container.place(x=event.x_root - root.winfo_rootx() - 32, y=event.y_root - root.winfo_rooty() - 32)
+    container.place(x=event.x_root - root.winfo_rootx() - 32, y=event.y_root - root.winfo_rooty() - texture_height[texture_pack] / 2)
 
 
 # Binds
@@ -105,6 +110,10 @@ for index, component_class in component_list.items():
         selection_frame, text= component_class.name,variable= var, value= index, indicatoron= False
         )
     component_selection.grid(row= 0, column= index)
+
+
+
+
 
 
 
