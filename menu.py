@@ -1,6 +1,7 @@
 #menu.py
 
 import tkinter as tk
+import component
 import webbrowser
 
 def open_link(url):
@@ -30,6 +31,11 @@ def controls_guide():
     guide_text = tk.Label(guide, text= control_guide_text, justify="left")
     guide_text.pack()
 
+def set_texture_pack(pack_name):
+    component.texture_pack = pack_name
+
+
+
 
 def initialize_menu(root: tk.Tk):
     menubar = tk.Menu(root)
@@ -44,6 +50,11 @@ def initialize_menu(root: tk.Tk):
     helpmenu.add_command(label= "About", command= aboutwindow)
     helpmenu.add_command(label= "Controls", command= controls_guide)
     menubar.add_cascade(label= "Help", menu= helpmenu)
+
+    # texturemenu = tk.Menu(menubar, tearoff=0)
+    # texturemenu.add_command(label= "Symbolic", command= set_texture_pack("Symbolic"))
+    # texturemenu.add_command(label= "64x64", command= set_texture_pack("64x64"))
+    # menubar.add_cascade(label= "Theme", menu= texturemenu)   
 
 
     root.config(menu=menubar)
