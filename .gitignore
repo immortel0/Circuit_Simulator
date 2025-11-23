@@ -10,3 +10,6 @@ __pycache__
 build/
 dist/
 matrix3.py
+.vscode
+component2.py
+network.py
