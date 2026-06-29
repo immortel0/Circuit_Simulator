@@ -93,6 +93,9 @@ class Component:
 
         self.rect = canvas.create_image(x, y, image= self.image)
 
+        # Create value label above component
+        self.value_label = self.create_value_label()
+
         self.port1 = Port(self, -32, 0)
         self.port2 = Port(self, 32, 0)
 
@@ -102,7 +105,7 @@ class Component:
         
         canvas.tag_bind(self.rect, "<Button-1>", self.handle_b1)
         canvas.tag_bind(self.rect, "<B1-Motion>", self.on_drag)
-        canvas.tag_bind(self.rect, "<Button-3>", self.delete)
+        canvas.tag_bind(self.rect, "<Button-3>", self.configure_component)
 
     def on_click(self, event):
         self.drag_offset_x = event.x - self.x
@@ -116,6 +119,7 @@ class Component:
         dy = new_y - self.y
 
         self.canvas.move(self.rect, dx, dy)
+        self.canvas.move(self.value_label, dx, dy)
     
         self.port1.move(dx, dy)
         self.port2.move(dx, dy)
@@ -128,12 +132,85 @@ class Component:
             self.canvas.delete(port.circle)
 
         self.canvas.delete(self.rect)
+        self.canvas.delete(self.value_label)
         components.remove(self)
 
     def handle_b1(self, event):
+        global delete_mode
         if delete_mode:
             self.delete(event)
         else:
             self.on_click(event)
+    
+    def configure_component(self, event):
+        # Import here to avoid circular import
+        import menu
+        import tkinter as tk
+        # Get the menu instance from root
+        root = tk._default_root
+        if hasattr(root, 'menu_instance'):
+            root.menu_instance.config_component(self.component)
+            # Update the label after configuration
+            self.update_value_label()
+    
+    def create_value_label(self):
+        """Create a text label showing the component value"""
+        value_text = self.get_value_text()
+        label = self.canvas.create_text(
+            self.x, self.y - 40,
+            text=value_text,
+            font=("Arial", 10, "bold"),
+            fill="black",
+            anchor="center"
+        )
+        return label
+    
+    def update_value_label(self):
+        """Update the value label text"""
+        value_text = self.get_value_text()
+        self.canvas.itemconfig(self.value_label, text=value_text)
+    
+    def get_value_text(self):
+        """Get the formatted value text for display"""
+        comp_type = self.component.__class__.__name__
+        
+        if comp_type == 'Resistor':
+            value = self.component.property
+            if value >= 1000:
+                return f"{value/1000:.1f}kΩ"
+            else:
+                return f"{value:.1f}Ω"
+        elif comp_type == 'Voltage_Source':
+            return f"{self.component.voltage:.1f}V"
+        elif comp_type == 'Current_Source':
+            current = self.component.current
+            if abs(current) >= 1:
+                return f"{current:.2f}A"
+            elif abs(current) >= 0.001:
+                return f"{current*1000:.1f}mA"
+            elif abs(current) >= 0.000001:
+                return f"{current*1000000:.1f}µA"
+            else:
+                return f"{current*1000000000:.1f}nA"
+        elif comp_type == 'Capacitor':
+            value = self.component.property
+            if value >= 1:
+                return f"{value:.1f}F"
+            elif value >= 0.001:
+                return f"{value*1000:.1f}mF"
+            elif value >= 0.000001:
+                return f"{value*1000000:.1f}µF"
+            else:
+                return f"{value*1000000000:.1f}nF"
+        elif comp_type == 'Inductor':
+            value = self.component.property
+            if value >= 1:
+                return f"{value:.1f}H"
+            elif value >= 0.001:
+                return f"{value*1000:.1f}mH"
+            else:
+                return f"{value*1000000:.1f}µH"
+        else:
+            return ""
 
 selected_port = None

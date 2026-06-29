@@ -3,6 +3,7 @@
 import tkinter as tk
 import component
 import webbrowser
+import simulator_integration
 
 class Menu:
     def __init__(self, root: tk.Tk):
@@ -19,6 +20,9 @@ class Menu:
         self.helpmenu.add_command(label= "About", command= self.aboutwindow)
         self.helpmenu.add_command(label= "Controls", command= self.controls_guide)
         self.menubar.add_cascade(label= "Help", menu= self.helpmenu)
+
+        # Add Circuit Analysis menu
+        simulator_integration.add_analysis_menu(self.menubar, root)
 
         # texturemenu = tk.Menu(menubar, tearoff=0)
         # texturemenu.add_command(label= "Symbolic", command= set_texture_pack("Symbolic"))
@@ -59,26 +63,44 @@ class Menu:
         component.texture_pack = pack_name
 
     def config_component(self, component):
-        self.value_var=tk.StringVar()
+        self.value_var = tk.StringVar()
         self.config = tk.Toplevel(self.root)
         self.config.title(f"Configure {component.name}")
         self.config.geometry("300x200")
         self.config.resizable(width=False, height=False)
         self.config.focus_force()
 
-        self.value_label = tk.Label(self.config, text = f'{component.property_name}: ', font=('calibre',10, 'bold'))
-        self.value_entry = tk.Entry(self.config, textvariable = self.value_var, width= 10)
-        self.value_units = tk.Label(self.config, text = f' {component.property_unit}', font=('calibre',10, 'bold'))
-        self.submit = tk.Button(self.config, text= "Enter", command= self.enter_value(self.value_var, component))
+        # Set current value
+        if hasattr(component, 'property'):
+            self.value_var.set(str(component.property))
+        elif hasattr(component, 'voltage'):
+            self.value_var.set(str(component.voltage))
+        elif hasattr(component, 'current'):
+            self.value_var.set(str(component.current))
 
-        self.value_label.grid(row=0, column=0, padx= 20, pady= 20)
+        self.value_label = tk.Label(self.config, text=f'{component.property_name}: ', font=('calibre', 10, 'bold'))
+        self.value_entry = tk.Entry(self.config, textvariable=self.value_var, width=10)
+        self.value_units = tk.Label(self.config, text=f' {component.property_unit}', font=('calibre', 10, 'bold'))
+        self.submit = tk.Button(self.config, text="Enter", command=lambda: self.enter_value(component))
+
+        self.value_label.grid(row=0, column=0, padx=20, pady=20)
         self.value_entry.grid(row=0, column=1)
         self.value_units.grid(row=0, column=2)
-        self.submit.grid(row= 1, column= 1)
+        self.submit.grid(row=1, column=1)
         
-        
-    def enter_value(self, var, component): 
-        component.property = float(var)
+    def enter_value(self, component): 
+        try:
+            value = float(self.value_var.get())
+            if hasattr(component, 'property'):
+                component.property = value
+            elif hasattr(component, 'voltage'):
+                component.voltage = value
+            elif hasattr(component, 'current'):
+                component.current = value
+            self.config.destroy()
+            print(f"Updated {component.name} to {value}")
+        except ValueError:
+            print("Invalid value entered")
         
 
 
@@ -88,7 +110,7 @@ class Menu:
 
     about_text = """Circuit Simulator v1.0
 
-    Project for EE205 - Circuit Theory
+    Project for EE204 - Circuit Theory
 
     Made by
     Anurag Kole, Arnab Deka
@@ -105,5 +127,5 @@ class Menu:
     - Right Click on component to change its values
     """
 
-    link_text = "Source Code"
+    link_text = "Source Code (yet to be updated)"
     link_url = "https://github.com/immortel0/Circuit_Simulator"

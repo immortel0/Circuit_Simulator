@@ -3,7 +3,6 @@ example.py
 file.py
 helper.py
 matrix.py
-matrix2.py
 main.spec
 image.png
 __pycache__
@@ -13,3 +12,11 @@ matrix3.py
 .vscode
 component2.py
 network.py
+netlist.py
+solver.py
+main2.py
+laplace.py
+manim.py
+matrix2.py
+matrix_v3.py
+copy

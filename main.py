@@ -28,6 +28,7 @@ root.geometry("800x600")
 
 
 new_menu = menu.Menu(root)
+root.menu_instance = new_menu  # Store menu instance for component configuration
 
 components = []
 selected_port = None
@@ -40,8 +41,8 @@ canvas = tk.Canvas(root, bg="gray", width=800, height=400)
 canvas.pack(side=tk.BOTTOM, fill= "both", expand=True)
 
 def place_component(event: tk.Event):
-    if canvas.find_withtag("current"): 
-        return  # don't place if clicked on existing image
+    if canvas.find_withtag(tk.CURRENT):
+        return
 
     mouse_x = event.x
     mouse_y = event.y
@@ -148,9 +149,20 @@ selection_frame.pack(side= tk.TOP ,fill= "x")
 
 
 var = tk.StringVar(root)
+var.set("0")  # Set default to Resistor
+
+def on_component_select():
+    """Handle component selection changes"""
+    selected = var.get()
+    if selected == "10":  # DELETE mode
+        wm.delete_mode = True
+    else:
+        wm.delete_mode = False
+
 for index, component_class in component_list.items():
     component_selection = tk.Radiobutton(
-        selection_frame, text= component_class.name,variable= var, value= index, indicatoron= False
+        selection_frame, text= component_class.name, variable= var, 
+        value= index, indicatoron= False, command= on_component_select
         )
     component_selection.grid(row= 0, column= index)
 
